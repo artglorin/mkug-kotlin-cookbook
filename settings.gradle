@@ -2,3 +2,4 @@ rootProject.name = 'mkug-kotlin-cookbook'
 
 include "common"
 include "frontend"
+include "backend"
