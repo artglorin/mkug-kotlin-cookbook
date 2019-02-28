@@ -9,6 +9,11 @@ kotlin {
         compilations.main {
             outputKinds("EXECUTABLE")
             entryPoint 'sample.main'
+            cinterops {
+                curl { // Имя файла .def
+                    
+                }
+            }
         }
     }
     sourceSets {
