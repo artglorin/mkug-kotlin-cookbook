@@ -1,3 +1,5 @@
+package sample
+
 fun main(args: Array<String>) {
     val arguments = args.toArguments()
     for (index in arguments.count downTo 0) {
