@@ -8,7 +8,7 @@ kotlin {
     macosX64("sample") {
         compilations.main {
             outputKinds("EXECUTABLE")
-            entryPoint 'sample.curl'
+            entryPoint 'sample.concurrency'
             cinterops {
                 curl { // Имя файла .def
                     
@@ -29,7 +29,7 @@ task runProgram {
         def programFile = kotlin.targets.sample.compilations.main.getBinary('EXECUTABLE', buildType)
         exec {
             executable programFile
-            args "https://kotlinlang.org"
+            args 5
         }
     }
 }
