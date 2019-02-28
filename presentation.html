@@ -1,0 +1,166 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Поваренная книга Kotlin Native / Multiplatform</title><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui" name="viewport"><link href="reveal.js/css/reveal.css" rel="stylesheet"><link rel="stylesheet" href="reveal.js/css/theme/black.css" id="theme"><link href="reveal.js/lib/css/zenburn.css" rel="stylesheet"><script>var link = document.createElement( 'link' );
+link.rel = 'stylesheet';
+link.type = 'text/css';
+link.href = window.location.search.match( /print-pdf/gi ) ? "reveal.js/css/print/pdf.css" : "reveal.js/css/print/paper.css";
+document.getElementsByTagName( 'head' )[0].appendChild( link );</script><!--[if lt IE 9]><script src="reveal.js/lib/js/html5shiv.js"></script><![endif]--></head><body><div class="reveal"><div class="slides"><section class="title" data-state="title"><h1>Поваренная книга <br> Kotlin Native / Multiplatform</h1><div class="preamble"><div style="page-break-after: always;"></div></div></section>
+<section><section id=""><h2>Структура доклада</h2><div class="olist arabic"><ol class="arabic"><li class="fragment"><p>Вводная часть</p></li><li class="fragment"><p><strong>Kotlin Native</strong></p><div class="olist arabic"><ol class="arabic"><li class="fragment"><p>Общий обзор технологии</p></li><li class="fragment"><p>Преобразование <strong>Kotlin</strong> в платформенный код <strong>C</strong></p></li><li class="fragment"><p>Вызов нативных библиотек написанных на <strong>C</strong> из <strong>Kotlin</strong> кода</p></li><li class="fragment"><p>документация: Klib, многопоточность, тестирование</p></li></ol></div></li></ol></div></section><section id=""><h2>Структура доклада</h2><div class="olist arabic"><ol class="arabic" start="3"><li class="fragment"><p><strong>Koltin MPP</strong></p><div class="olist arabic"><ol class="arabic"><li class="fragment"><p>Общий обзор методологии</p></li><li class="fragment"><p>Обзор библиотеки <strong>Kotlin Common</strong></p></li><li class="fragment"><p>Создание клиент серверного приложения</p></li><li class="fragment"><p>Создание ядра приложения на <strong>Kotlin Common</strong> и реализация платформозависимых классов</p></li></ol></div></li><li class="fragment"><p>Заключение</p></li></ol></div>
+<div style="page-break-after: always;"></div></section></section>
+<section id=""><h2><strong>Владислав Верминский</strong><br></h2><div class="paragraph"><p><em>aka: artglorin</em><br>
+Software engineer</p></div>
+<div class="openblock left"><div class="content"><div class="paragraph"><p><span class="image"><img src="./images/me.jpg" alt="ME" width="300" height="400"></span></p></div></div></div>
+<div style="page-break-after: always;"></div></section>
+<section><section id="kotlin_native"><h2>Kotlin Native</h2></section><section id="kotlin_native"><h2>Обзор Kotlin Native</h2><div class="ulist"><ul><li class="fragment"><p>Kotlin source</p></li><li class="fragment"><p>Koltinc compiler</p></li><li class="fragment"><p>LLVM</p></li><li class="fragment"><p>native compiler</p></li><li class="fragment"><p>bytecode</p></li></ul></div></section><section id="kotlin_native_2"><h2>Обзор Kotlin Native</h2><div class="ulist"><ul><li class="fragment"><p>Java source</p></li><li class="fragment"><p>javac compiler</p></li><li class="fragment"><p>Java byte code</p></li><li class="fragment"><p>JVM</p></li><li class="fragment"><p>bytecode</p></li></ul></div>
+<div style="page-break-after: always;"></div></section><section id=""><h2>Поддерживаемые компиляторы:</h2><div class="olist arabic"><ol class="arabic"><li class="fragment"><p>iOS (arm32, arm64, emulator x86_64)</p></li><li class="fragment"><p>MacOS (x86_64)</p></li><li class="fragment"><p>Android (arm32, arm64)</p></li><li class="fragment"><p>Windows (mingw x86_64)</p></li><li class="fragment"><p>Linux (x86_64, arm32, MIPS, MIPS little endian)</p></li><li class="fragment"><p>WebAssembly (wasm32) !!experemtal!!</p></li></ol></div></section><section id=""><h2>Поддерживаемые компиляторы:</h2><div class="ulist"><ul><li class="fragment"><p>Java Byte code?!</p></li><li class="fragment"><p>JS?!</p></li></ul></div>
+<div style="page-break-after: always;"></div></section><section id="native_"><h2>Взаимодействие с Native кодом</h2><div class="sidebarblock"><div class="content"><div class="olist arabic"><ol class="arabic"><li class="fragment"><p>Kotlin код компилируется в нативный код:</p><div class="olist loweralpha"><ol class="loweralpha" type="a"><li><p>в исполняемый файл</p></li><li><p>в динамические библиотеки</p></li><li><p>в AppleFramework для работы с <strong>Objective-C</strong>, <strong>Swift</strong></p></li></ol></div></li><li class="fragment"><p>Kotlin код вызывает нативный код</p></li></ol></div></div></div>
+<div style="page-break-after: always;"></div></section><section id="kotlin__native_"><h2>Компиляция Kotlin в Native код</h2><div class="ulist"><ul><li class="fragment"><p>Пререквизиты:</p><div class="ulist"><ul><li><p>скачать/собрать <em>kotlin-native compilator</em></p></li><li><p>загрузить код LLVM</p></li></ul></div></li><li class="fragment"><p>Скомпилируем Kotlin код в нативный код, двумя способами:</p><div class="ulist"><ul><li><p>без <strong>IDE</strong></p></li><li><p>через <strong>Intellij Idea | gradle plugin</strong></p></li></ul></div></li></ul></div>
+<div style="page-break-after: always;"></div></section><section id="c___kotlin"><h2>Вызов C метода из Kotlin</h2><div class="ulist"><ul><li class="fragment"><p>Пререквизиты:</p><div class="ulist"><ul><li><p>Установить библиотеку с исходным кодом curl "<em>libcurl4-openssl-dev</em>"</p></li><li><p>скачать/собрать <em>kotlin-native compilator</em></p></li></ul></div></li><li class="fragment"><p>Выполним компиляцию моста через <code>cinterop</code> двумя способами:</p><div class="ulist"><ul><li><p>Без <strong>IDE</strong></p></li><li><p><strong>Intellij Idea | gradle plugin</strong></p></li></ul></div></li></ul></div>
+<div style="page-break-after: always;"></div></section><section id="c__kotlin"><h2>Какие сложности возникают при вызове кода C из Kotlin?</h2><div class="paragraph"><p>необходимо иметь исходники кода библиотек;<br>
+скачать/скомпилировать <strong>kotlinс-native compiler</strong>;<br>
+код сгенерированный через <strong>cinterop</strong> выглядит ужасно;<br>
+нужен <strong>LLVM</strong>;<br>
+компиляция проходит долго.</p></div>
+<div style="page-break-after: always;"></div></section><section id=""><h2>Многопоточность</h2><table class="tableblock frame-all grid-all stretch" style="width:100%"><colgroup><col style="width:50%"><col style="width:50%"></colgroup><thead><tr><th class="tableblock halign-center valign-top" colspan="2"><em><a href="http://kotlinlang.org/docs/reference/native/concurrency.html" class="bare">http://kotlinlang.org/docs/reference/native/concurrency.html</a></em></th></tr><tbody><tr><td class="tableblock halign-left valign-top"><div><div class="ulist"><ul><li class="fragment"><p>Концепция workers</p></li><li class="fragment"><p>Неизменяемость передаваемых объектов</p></li><li class="fragment"><p>Заморозка объектов</p></li></ul></div></div></td><td class="tableblock halign-left valign-top"><div><div class="ulist"><ul><li class="fragment"><p>Отсоединение подграфа объектов</p></li><li class="fragment"><p>Разделение памяти</p></li><li class="fragment"><p>Глобальные переменные и объекты одиночки</p></li></ul></div></div></td></tr></table>
+<div style="page-break-after: always;"></div></section><section><div class="ulist"><div class="title">Прочие темы</div><ul><li class="fragment"><p>Неизменяемые данные
+<em><a href="http://kotlinlang.org/docs/reference/native/immutability.html" class="bare">http://kotlinlang.org/docs/reference/native/immutability.html</a></em></p></li><li class="fragment"><p>Обзор технологии Kotlin Native
+<em><a href="http://kotlinlang.org/docs/reference/native-overview.html" class="bare">http://kotlinlang.org/docs/reference/native-overview.html</a></em></p></li><li class="fragment"><p>Klib
+<em><a href="http://kotlinlang.org/docs/reference/native/libraries.html" class="bare">http://kotlinlang.org/docs/reference/native/libraries.html</a></em></p></li><li class="fragment"><p>Платформенные библиотеки
+<em><a href="http://kotlinlang.org/docs/reference/native/platform_libs.html" class="bare">http://kotlinlang.org/docs/reference/native/platform_libs.html</a></em></p></li></ul></div></section><section><div class="ulist"><div class="title">Прочие темы</div><ul><li class="fragment"><p>Cinterop
+<em><a href="http://kotlinlang.org/docs/reference/native/c_interop.html" class="bare">http://kotlinlang.org/docs/reference/native/c_interop.html</a></em></p></li><li class="fragment"><p>Взаимодействие с Objective-C и Swift.
+<em><a href="http://kotlinlang.org/docs/reference/native/objc_interop.html" class="bare">http://kotlinlang.org/docs/reference/native/objc_interop.html</a></em></p></li><li class="fragment"><p>Описание gradle plugin.
+<em><a href="http://kotlinlang.org/docs/reference/native/gradle_plugin.html" class="bare">http://kotlinlang.org/docs/reference/native/gradle_plugin.html</a></em></p></li><li class="fragment"><p>Отладка Kotlin Native
+<em><a href="http://kotlinlang.org/docs/reference/native/debugging.html" class="bare">http://kotlinlang.org/docs/reference/native/debugging.html</a></em></p></li></ul></div></section><section><div class="ulist"><div class="title">Прочие темы</div><ul><li class="fragment"><p>Github репозиторий Kotlin Native
+<em><a href="https://github.com/JetBrains/kotlin-native" class="bare">https://github.com/JetBrains/kotlin-native</a></em></p></li><li class="fragment"><p>Список частых вопросов и ответов.
+<em><a href="http://kotlinlang.org/docs/reference/native/faq.html" class="bare">http://kotlinlang.org/docs/reference/native/faq.html</a></em></p></li></ul></div>
+<div style="page-break-after: always;"></div></section></section>
+<section><section id="kotlin_runtime"><h2>Kotlin Runtime</h2><div class="paragraph"><p><em><a href="http://kotlinlang.org/api/latest/jvm/stdlib/" class="bare">http://kotlinlang.org/api/latest/jvm/stdlib/</a></em></p></div><div class="paragraph"><p>Каждый kotlin проект имеет kotlin runtime. Он подтягивается прямо или косвено.</p></div><hr><div class="paragraph"><p>На странице с документацией по Kotlin runtime можно найти польное описание пакетов, классов и методов с указанием того для какого рантайма они подходят.</p></div></section><section data-transition="slide"><div class="imageblock" style=""><img src="./images/kotlin_runtime_01.png" alt="rnt-1" width="100%" height="100%"></div></section><section data-transition="slide"><div class="imageblock" style=""><img src="./images/kotlin_runtime_02.png" alt="rnt-2" width="100%" height="100%"></div>
+<div class="paragraph"><p>Но могут быть различия в пакетах&#8230;&#8203;</p></div></section><section data-transition="slide"><div class="imageblock" style=""><img src="./images/kotlin_runtime_03.png" alt="rnt-3" width="80%"></div>
+<div class="paragraph"><p>классах&#8230;&#8203;</p></div></section><section data-transition="slide"><div class="imageblock" style=""><img src="./images/kotlin_runtime_04.png" alt="rnt-4" width="80%"></div>
+<div class="paragraph"><p>методах!</p></div>
+<div style="page-break-after: always;"></div></section><section id="kotlin_common"><h2>Kotlin common</h2><div class="paragraph"><p>Common – это не рантайм, это библиотека с набором классов и методов, для которых есть реализация на всех платформах.</p></div>
+<div style="page-break-after: always;"></div></section></section>
+<section><section id="kotlin_multiplatform"><h2>Kotlin Multiplatform</h2></section><section><table class="tableblock frame-all grid-all stretch" style=""><colgroup><col><col></colgroup><thead><tr><th class="tableblock halign-left valign-top">Библиотеки</th><th class="tableblock halign-left valign-top">Платформы</th></tr><tbody><tr><td class="tableblock halign-left valign-top"><p class="tableblock">• Kotlin Common<br>
+• Kotlin JVM<br>
+• Kotlin C/C++<br>
+• Kotlin Swift/Objective-C<br>
+• Kotlin JS</p></td><td class="tableblock halign-left valign-top"><p class="tableblock">• iOS (arm32, arm64, emulator x86_64)<br>
+• MacOS (x86_64)<br>
+• Android (arm32, arm64)<br>
+• Windows (mingw x86_64)<br>
+• Linux (x86_64, arm32, MIPS, MIPS little endian)<br>
+• WebAssembly (wasm32)<br>
+• JVM<br>
+• JS</p></td></tr></table>
+<div style="page-break-after: always;"></div></section><section id="kotlin_mpp"><h2>Клиент-серверное приложение с использованием Kotlin MPP</h2></section><section><div class="paragraph"><p>Cтруктура проекта будет выглядеть так:</p></div>
+<div class="listingblock"><div class="content"><pre class="highlight"><code>root_dir
+|__common_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gradle
+|__backend_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gralde
+|__frontend_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gralde
+build.gradle</code></pre></div></div>
+<div style="page-break-after: always;"></div></section><section id="kotlin_common"><h2>Приложение с ядром написанным на Kotlin Common</h2><div class="paragraph"><p>Когда нужно вынести всю бизнес логику и доменную область в отдельный модуль, то для этого используется ключевые слова <strong>expected</strong> и <strong>actual</strong></p></div>
+<div style="page-break-after: always;"></div></section><section id=""><h2>Заключение</h2><div class="paragraph"><p><strong>Kotlin Native - это компиляторы и библиотеки для разработки на С/Objective-C/Swift</strong></p></div>
+<hr>
+<div class="paragraph"><p><strong>Koltin MPP - это подход к разработке осонванный на использовании библиотеки Kotlin-common</strong></p></div>
+<hr></section><section id=""><h2>Заключение</h2><div class="ulist"><ul><li class="fragment"><p>Когда стоит писать на Kotlin Native?</p></li><li class="fragment"><p>Когда не стоит писать на Kotlin Native?</p></li><li class="fragment"><p>Стоит ли писать используя MPP подход?</p></li></ul></div></section><section><div class="paragraph"><p>СПАСИБО!</p></div></section></section></div></div><script src="reveal.js/lib/js/head.min.js"></script><script src="reveal.js/js/reveal.js"></script><script>// See https://github.com/hakimel/reveal.js#configuration for a full list of configuration options
+Reveal.initialize({
+  // Display controls in the bottom right corner
+  controls: true,
+  // Display a presentation progress bar
+  progress: true,
+  // Set a per-slide timing for speaker notes, null means none
+  defaultTiming: null,
+  // Display the page number of the current slide
+  slideNumber: false,
+  // Push each slide change to the browser history
+  history: false,
+  // Enable keyboard shortcuts for navigation
+  keyboard: true,
+  // Enable the slide overview mode
+  overview: true,
+  // Vertical centering of slides
+  center: false,
+  // Enables touch navigation on devices with touch input
+  touch: true,
+  // Loop the presentation
+  loop: false,
+  // Change the presentation direction to be RTL
+  rtl: false,
+  // Randomizes the order of slides each time the presentation loads
+  shuffle: false,
+  // Turns fragments on and off globally
+  fragments: true,
+  // Flags if the presentation is running in an embedded mode,
+  // i.e. contained within a limited portion of the screen
+  embedded: false,
+  // Flags if we should show a help overlay when the questionmark
+  // key is pressed
+  help: true,
+  // Flags if speaker notes should be visible to all viewers
+  showNotes: false,
+  // Global override for autolaying embedded media (video/audio/iframe)
+  // - null: Media will only autoplay if data-autoplay is present
+  // - true: All media will autoplay, regardless of individual setting
+  // - false: No media will autoplay, regardless of individual setting
+  autoPlayMedia: null,
+  // Number of milliseconds between automatically proceeding to the
+  // next slide, disabled when set to 0, this value can be overwritten
+  // by using a data-autoslide attribute on your slides
+  autoSlide: 0,
+  // Stop auto-sliding after user input
+  autoSlideStoppable: true,
+  // Enable slide navigation via mouse wheel
+  mouseWheel: false,
+  // Hides the address bar on mobile devices
+  hideAddressBar: true,
+  // Opens links in an iframe preview overlay
+  previewLinks: false,
+  // Theme (e.g., beige, black, league, night, serif, simple, sky, solarized, white)
+  // NOTE setting the theme in the config no longer works in reveal.js 3.x
+  //theme: Reveal.getQueryHash().theme || 'black',
+  // Transition style (e.g., none, fade, slide, convex, concave, zoom)
+  transition: Reveal.getQueryHash().transition || 'fade',
+  // Transition speed (e.g., default, fast, slow)
+  transitionSpeed: 'default',
+  // Transition style for full page slide backgrounds (e.g., none, fade, slide, convex, concave, zoom)
+  backgroundTransition: 'fade',
+  // Number of slides away from the current that are visible
+  viewDistance: 3,
+  // Parallax background image (e.g., "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'")
+  parallaxBackgroundImage: '',
+  // Parallax background size in CSS syntax (e.g., "2100px 900px")
+  parallaxBackgroundSize: '',
+
+  // The "normal" size of the presentation, aspect ratio will be preserved
+  // when the presentation is scaled to fit different resolutions. Can be
+  // specified using percentage units.
+  width: 960,
+  height: 700,
+
+  // Factor of the display size that should remain empty around the content
+  margin: 0.1,
+
+  // Bounds for smallest/largest possible scale to apply to content
+  minScale: 0.2,
+  maxScale: 1.5,
+
+  // Optional libraries used to extend on reveal.js
+  dependencies: [
+      { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      
+      { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+      { src: 'reveal.js/plugin/notes/notes.js', async: true }
+  ]
+});</script></body></html>

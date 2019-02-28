@@ -1,0 +1,310 @@
+= Поваренная книга pass:q[<br>] Kotlin Native / Multiplatform
+:toc: left
+:toc-title: Содержание доклада
+:toclevels:
+:imagesdir: ./images
+:revealjs_transition: fade
+// none, fade, slide, convex, concave, zoom
+:revealjs_center: false
+
+<<<
+
+== Структура доклада
+[%step]
+. Вводная часть
+. *Kotlin Native*
+[arabic]
+[%step]
+.. Общий обзор технологии
+.. Преобразование *Kotlin* в платформенный код *C*
+.. Вызов нативных библиотек написанных на *C* из *Kotlin* кода
+.. документация: Klib, многопоточность, тестирование
+
+ifdef::backend-revealjs[=== Структура доклада]
+[%step]
+[start=3]
+. *Koltin MPP*
+[arabic]
+[%step]
+.. Общий обзор методологии
+.. Обзор библиотеки *Kotlin Common*
+.. Создание клиент серверного приложения
+.. Создание ядра приложения на *Kotlin Common* и реализация платформозависимых классов
+. Заключение
+
+<<<
+
+== *Владислав Верминский* +
+_aka: artglorin_ +
+Software engineer
+
+[.left]
+--
+image:me.jpg[ME, 300, 400, style="float: left; display: inline-block;"]
+--
+
+<<<
+
+== Kotlin Native
+
+=== Обзор Kotlin Native
+
+[%step]
+- Kotlin source
+- Koltinc compiler
+- LLVM
+- native compiler
+- bytecode
+
+ifdef::backend-revealjs[=== Обзор Kotlin Native]
+
+[%step]
+- Java source
+- javac compiler
+- Java byte code
+- JVM
+- bytecode
+
+<<<
+
+=== Поддерживаемые компиляторы:
+
+[%step]
+. iOS (arm32, arm64, emulator x86_64)
+. MacOS (x86_64)
+. Android (arm32, arm64)
+. Windows (mingw x86_64)
+. Linux (x86_64, arm32, MIPS, MIPS little endian)
+. WebAssembly (wasm32) !!experemtal!!
+
+ifdef::backend-revealjs[=== Поддерживаемые компиляторы:]
+[%step]
+- #Java Byte code?!#
+- #JS?!#
+
+<<<
+
+=== Взаимодействие с Native кодом
+****
+[%step]
+. Kotlin код компилируется в нативный код:
+.. в исполняемый файл
+.. в динамические библиотеки
+.. в AppleFramework для работы с *Objective-C*, *Swift*
+. Kotlin код вызывает нативный код
+****
+
+<<<
+
+=== Компиляция Kotlin в Native код
+
+[%step]
+* Пререквизиты:
+** скачать/собрать _kotlin-native compilator_
+** загрузить код LLVM
+* Скомпилируем Kotlin код в нативный код, двумя способами:
+** без *IDE*
+** через *Intellij Idea | gradle plugin*
+
+<<<
+
+=== Вызов C метода из Kotlin
+[%step]
+* Пререквизиты:
+** Установить библиотеку с исходным кодом curl "_libcurl4-openssl-dev_"
+** скачать/собрать _kotlin-native compilator_
+* Выполним компиляцию моста через `cinterop` двумя способами:
+** Без *IDE*
+** *Intellij Idea | gradle plugin*
+
+<<<
+
+=== Какие сложности возникают при вызове кода C из Kotlin?
+
+необходимо иметь исходники кода библиотек; +
+скачать/скомпилировать *kotlinс-native compiler*; +
+код сгенерированный через *cinterop* выглядит ужасно; +
+нужен *LLVM*; +
+компиляция проходит долго.
+
+<<<
+
+=== Многопоточность
+
+[cols=2*, options="header"]
+[.stretch]
+|===
+
+2.+^|__http://kotlinlang.org/docs/reference/native/concurrency.html__
+.<a|
+[%step]
+* Концепция workers
+* Неизменяемость передаваемых объектов
+* Заморозка объектов
+.<a|
+[%step]
+* Отсоединение подграфа объектов
+* Разделение памяти
+* Глобальные переменные и объекты одиночки
+|===
+
+<<<
+
+ifdef::backend-revealjs[=== !]
+.Прочие темы
+[%step]
+- Неизменяемые данные
+  __http://kotlinlang.org/docs/reference/native/immutability.html__
+- Обзор технологии Kotlin Native
+  __http://kotlinlang.org/docs/reference/native-overview.html__
+- Klib
+  __http://kotlinlang.org/docs/reference/native/libraries.html__
+- Платформенные библиотеки
+  __http://kotlinlang.org/docs/reference/native/platform_libs.html__
+
+ifdef::backend-revealjs[=== !]
+ifdef::backend-revealjs[.Прочие темы]
+[%step]
+- Cinterop
+__http://kotlinlang.org/docs/reference/native/c_interop.html__
+- Взаимодействие с Objective-C и Swift.
+  __http://kotlinlang.org/docs/reference/native/objc_interop.html__
+- Описание gradle plugin.
+  __http://kotlinlang.org/docs/reference/native/gradle_plugin.html__
+- Отладка Kotlin Native
+  __http://kotlinlang.org/docs/reference/native/debugging.html__
+
+ifdef::backend-revealjs[=== !]
+ifdef::backend-revealjs[.Прочие темы]
+[%step]
+- Github репозиторий Kotlin Native
+  __https://github.com/JetBrains/kotlin-native__
+- Список частых вопросов и ответов.
+  __http://kotlinlang.org/docs/reference/native/faq.html__
+
+<<<
+
+== Kotlin Runtime
+
+__http://kotlinlang.org/api/latest/jvm/stdlib/__
+
+Каждый kotlin проект имеет kotlin runtime. Он подтягивается прямо или косвено.
+
+'''
+
+На странице с документацией по Kotlin runtime можно найти польное описание пакетов, классов и методов с указанием того для какого рантайма они подходят.
+
+[transition=slide, %notitle]
+ifdef::backend-revealjs[=== !]
+image::kotlin_runtime_01.png[rnt-1, 100%, 100%]
+
+[transition=slide, %notitle]
+ifdef::backend-revealjs[=== !]
+image::kotlin_runtime_02.png[rnt-2, 100%, 100%]
+
+Но могут быть различия в пакетах...
+
+[transition=slide, %notitle]
+ifdef::backend-revealjs[=== !]
+image::kotlin_runtime_03.png[rnt-3, 80%]
+
+классах...
+
+[transition=slide, %notitle]
+ifdef::backend-revealjs[=== !]
+image::kotlin_runtime_04.png[rnt-4, 80%]
+
+методах!
+
+<<<
+
+=== Kotlin common
+
+[%step]
+
+Common – это не рантайм, это библиотека с набором классов и методов, для которых есть реализация на всех платформах.
+
+<<<
+
+== Kotlin Multiplatform
+
+ifdef::backend-revealjs[=== !]
+[cols="~, ~", options="header"]
+[%autowidth.stretch]
+|===
+| Библиотеки | Платформы
+
+|
+• Kotlin Common +
+• Kotlin JVM +
+• Kotlin C/C++ +
+• Kotlin Swift/Objective-C +
+• Kotlin JS
+
+|
+• iOS (arm32, arm64, emulator x86_64) +
+• MacOS (x86_64) +
+• Android (arm32, arm64) +
+• Windows (mingw x86_64) +
+• Linux (x86_64, arm32, MIPS, MIPS little endian) +
+• WebAssembly (wasm32) +
+• JVM +
+• JS
+|===
+
+<<<
+
+=== Клиент-серверное приложение с использованием Kotlin MPP
+
+ifdef::backend-revealjs[=== !]
+
+Cтруктура проекта будет выглядеть так:
+
+```
+root_dir
+|__common_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gradle
+|__backend_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gralde
+|__frontend_module
+|   |__src
+|   |   |__main
+|   |   |__test
+|   build.gralde
+build.gradle
+```
+
+<<<
+
+=== Приложение с ядром написанным на Kotlin Common
+
+Когда нужно вынести всю бизнес логику и доменную область в отдельный модуль, то для этого используется ключевые слова *expected* и *actual*
+
+<<<
+
+=== Заключение
+
+*Kotlin Native - это компиляторы и библиотеки для разработки на С/Objective-C/Swift*
+
+'''
+
+*Koltin MPP - это подход к разработке осонванный на использовании библиотеки Kotlin-common*
+
+'''
+
+ifdef::backend-revealjs[=== Заключение]
+[%step]
+- Когда стоит писать на Kotlin Native?
+- Когда не стоит писать на Kotlin Native?
+- Стоит ли писать используя MPP подход?
+
+
+ifdef::backend-revealjs[=== !]
+
+СПАСИБО!
